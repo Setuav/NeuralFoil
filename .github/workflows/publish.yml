@@ -40,6 +40,7 @@ jobs:
         run: |
           uv venv /tmp/check
           uv pip install --python /tmp/check neuralfoil dist/*.whl
+          cd /tmp  # Away from the source tree, whose `neuralfoil/` would shadow the installed one.
           /tmp/check/bin/python -c "import neuralfoil, setuav_neuralfoil as nf; assert hasattr(nf, 'geometry') and not hasattr(neuralfoil, 'geometry'); nf.get_aero_from_naca('2412', alpha=4.0, Re=1e6)"
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
