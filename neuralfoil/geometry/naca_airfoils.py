@@ -12,7 +12,7 @@ References:
 
 import numpy as np
 
-from neuralfoil.geometry.kulfan import cosine_spacing
+from .kulfan import cosine_spacing
 
 _DEFAULT_N_POINTS_PER_SIDE = 200
 

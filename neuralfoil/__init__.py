@@ -1,4 +1,4 @@
-from neuralfoil.main import (
+from .main import (
     get_aero_from_kulfan_parameters,
     get_aero_from_airfoil,
     get_aero_from_coordinates,
@@ -6,7 +6,7 @@ from neuralfoil.main import (
     get_aero_from_naca,
     bl_x_points,
 )
-from neuralfoil import geometry
+from . import geometry
 
 __all__ = [
     "get_aero_from_kulfan_parameters",

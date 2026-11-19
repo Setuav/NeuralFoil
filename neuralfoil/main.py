@@ -4,8 +4,8 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from neuralfoil import _bl_points, geometry
-from neuralfoil._backend import cosd, length, np, sind, swish
+from . import _bl_points, geometry
+from ._backend import cosd, length, np, sind, swish
 
 if TYPE_CHECKING:
     import aerosandbox as asb

@@ -6,10 +6,10 @@ All coordinates are (N, 2) arrays in Selig order: from the upper-surface trailin
 leading edge, to the lower-surface trailing edge.
 """
 
-from neuralfoil.geometry.dat import read_dat
-from neuralfoil.geometry.kulfan import get_kulfan_coordinates, get_kulfan_parameters
-from neuralfoil.geometry.naca_airfoils import naca, naca4, naca5, naca5_camber_constants
-from neuralfoil.geometry.normalization import Normalization, normalize
+from .dat import read_dat
+from .kulfan import get_kulfan_coordinates, get_kulfan_parameters
+from .naca_airfoils import naca, naca4, naca5, naca5_camber_constants
+from .normalization import Normalization, normalize
 
 __all__ = [
     "read_dat",

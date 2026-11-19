@@ -14,7 +14,7 @@ from math import comb
 
 import numpy as np
 
-from neuralfoil.geometry.normalization import normalize
+from .normalization import normalize
 
 
 def get_kulfan_parameters(

@@ -19,8 +19,8 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar
 from scipy import interpolate
 
-from neuralfoil import _bl_points
-from neuralfoil._bl_points import compute_optimal_x_points  # noqa: F401 (re-exported for training scripts)
+from . import _bl_points
+from ._bl_points import compute_optimal_x_points  # noqa: F401 (re-exported for training scripts)
 
 
 @dataclass
