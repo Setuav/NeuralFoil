@@ -1576,13 +1576,15 @@ name = "neuralfoil"
 version = "0.3.3"
 source = { editable = "." }
 dependencies = [
-    { name = "aerosandbox" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 
 [package.optional-dependencies]
+asb = [
+    { name = "aerosandbox" },
+]
 test = [
     { name = "nbval" },
     { name = "pytest" },
@@ -1590,6 +1592,7 @@ test = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "aerosandbox" },
     { name = "nbval" },
     { name = "polars" },
     { name = "pytest" },
@@ -1598,6 +1601,7 @@ dev = [
     { name = "tqdm" },
 ]
 training = [
+    { name = "aerosandbox" },
     { name = "polars" },
     { name = "ray" },
     { name = "torch" },
@@ -1606,15 +1610,16 @@ training = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
+    { name = "aerosandbox", marker = "extra == 'asb'", specifier = ">=4.2.7,<4.3.0" },
     { name = "nbval", marker = "extra == 'test'", specifier = ">=0.10" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
 ]
-provides-extras = ["test"]
+provides-extras = ["test", "asb"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
     { name = "nbval", specifier = ">=0.10" },
     { name = "polars", specifier = ">=1.0" },
     { name = "pytest", specifier = ">=7.0" },
@@ -1623,6 +1628,7 @@ dev = [
     { name = "tqdm", specifier = ">=4.60" },
 ]
 training = [
+    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
     { name = "polars", specifier = ">=1.0" },
     { name = "ray", specifier = ">=2.7" },
     { name = "torch", specifier = ">=2.0" },

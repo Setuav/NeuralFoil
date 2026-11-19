@@ -5,7 +5,8 @@ coordinates, .dat file) give consistent answers for the same geometry.
 
 import numpy as np
 import pytest
-import aerosandbox as asb
+
+asb = pytest.importorskip("aerosandbox")
 
 import neuralfoil as nf
 

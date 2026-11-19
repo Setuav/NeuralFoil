@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 import neuralfoil as nf
-from neuralfoil._basic_data_type import Data
+from neuralfoil import _bl_points
 
 CAMBERED_KULFAN = dict(
     upper_weights=np.array([0.20, 0.25, 0.20, 0.27, 0.20, 0.25, 0.20, 0.20]),
@@ -78,7 +78,7 @@ def test_mirror_identity():
     np.testing.assert_allclose(aero_mirror["Top_Xtr"], aero["Bot_Xtr"], **tol)
     np.testing.assert_allclose(aero_mirror["Bot_Xtr"], aero["Top_Xtr"], **tol)
 
-    for i in range(Data.N):
+    for i in range(_bl_points.N):
         np.testing.assert_allclose(
             aero_mirror[f"upper_bl_H_{i}"], aero[f"lower_bl_H_{i}"], **tol
         )
@@ -101,7 +101,7 @@ def test_output_contract():
         f"{side}_bl_{quantity}_{i}"
         for side in ["upper", "lower"]
         for quantity in ["theta", "H", "ue/vinf"]
-        for i in range(Data.N)
+        for i in range(_bl_points.N)
     ]
     assert set(aero.keys()) == set(scalar_keys + bl_keys)
 
@@ -111,7 +111,7 @@ def test_output_contract():
     assert float(aero["CD"][0]) > 0
     assert 0 <= float(aero["Top_Xtr"][0]) <= 1
     assert 0 <= float(aero["Bot_Xtr"][0]) <= 1
-    for i in range(Data.N):
+    for i in range(_bl_points.N):
         assert float(aero[f"upper_bl_theta_{i}"][0]) > 0
         assert float(aero[f"lower_bl_theta_{i}"][0]) > 0
         assert float(aero[f"upper_bl_H_{i}"][0]) > 1
@@ -139,7 +139,7 @@ def test_vectorized_matches_scalar_loop():
 def test_bl_x_points_contract():
     """The exported BL sensor locations: N points, strictly increasing, within (0, 1)."""
     x = nf.bl_x_points
-    assert len(x) == Data.N
+    assert len(x) == _bl_points.N
     assert np.all(np.diff(x) > 0)
     assert np.all((x > 0) & (x < 1))
 

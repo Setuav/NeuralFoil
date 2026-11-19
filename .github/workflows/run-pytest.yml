@@ -19,6 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ '3.10' , '3.13' ]
+        extras: [ '--extra test --extra asb', '--extra test' ]  # With and without AeroSandbox.
 
     steps:
       - uses: actions/checkout@v5
@@ -28,4 +29,4 @@ jobs:
           enable-cache: true
       - name: Test with pytest
         run: |
-          uv run --python ${{ matrix.python-version }} --extra test --no-dev pytest tests
+          uv run --python ${{ matrix.python-version }} ${{ matrix.extras }} --no-dev pytest tests

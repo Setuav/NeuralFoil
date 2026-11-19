@@ -1,14 +1,20 @@
-import aerosandbox as asb
-import aerosandbox.numpy as np
+from __future__ import annotations
+
 from collections.abc import Iterable
 from pathlib import Path
-from neuralfoil._basic_data_type import Data
+from typing import TYPE_CHECKING
+
+from neuralfoil import _bl_points, geometry
+from neuralfoil._backend import cosd, length, np, sind, swish
+
+if TYPE_CHECKING:
+    import aerosandbox as asb
 
 nn_weights_dir = Path(__file__).parent / "nn_weights_and_biases"
 
 # These are the x-coordinates on the top and bottom surfaces of the airfoil where detailed boundary layer data is computed.
 # It is made externally-accessible (`nf.bl_x_points`) in case you want to use it dynamically.
-bl_x_points = Data.bl_x_points
+bl_x_points = _bl_points.bl_x_points
 
 def _sigmoid(x: float | np.ndarray) -> float | np.ndarray:
     """Numerically stable logistic function."""
@@ -151,7 +157,7 @@ def get_aero_from_kulfan_parameters(
     nn_params: dict[str, np.ndarray] = _nn_parameters[model_size]
 
     for key in ("upper_weights", "lower_weights"):
-        n_weights = np.length(kulfan_parameters[key])
+        n_weights = length(kulfan_parameters[key])
         if n_weights != 8:
             raise ValueError(
                 f"NeuralFoil's neural networks expect exactly 8 CST weights per side, but "
@@ -166,9 +172,9 @@ def get_aero_from_kulfan_parameters(
         *[kulfan_parameters["lower_weights"][i] for i in range(8)],
         kulfan_parameters["leading_edge_weight"],
         kulfan_parameters["TE_thickness"] * 50,
-        np.sind(2 * alpha),
-        np.cosd(alpha),
-        1 - np.cosd(alpha) ** 2,
+        sind(2 * alpha),
+        cosd(alpha),
+        1 - cosd(alpha) ** 2,
         (np.log(Re) - 12.5) / 3.5,
         # No mach parameter in this version
         (n_crit - 9) / 4.5,
@@ -179,13 +185,13 @@ def get_aero_from_kulfan_parameters(
     ### Handle the vectorization, where here we figure out how many cases the user wants to run
     N_cases = 1  # TODO rework this with np.atleast1d
     for row in input_rows:
-        if np.length(row) > 1:
+        if length(row) > 1:
             if N_cases == 1:
-                N_cases = np.length(row)
+                N_cases = length(row)
             else:
-                if np.length(row) != N_cases:
+                if length(row) != N_cases:
                     raise ValueError(
-                        f"The inputs to the neural network must all have the same length. (Conflicting lengths: {N_cases} and {np.length(row)})"
+                        f"The inputs to the neural network must all have the same length. (Conflicting lengths: {N_cases} and {length(row)})"
                     )
 
     for i, row in enumerate(input_rows):
@@ -229,7 +235,7 @@ def get_aero_from_kulfan_parameters(
             if (
                 len(layer_indices_to_iterate) != 0
             ):  # Don't apply the activation function on the last layer
-                x = np.swish(x)
+                x = swish(x)
         x = np.transpose(x)
         return x
 
@@ -273,7 +279,7 @@ def get_aero_from_kulfan_parameters(
     y_unflipped[:, 5] = y_flipped[:, 4]  # switch Bot_Xtr with Top_Xtr
 
     # switch upper and lower Ret, H
-    N = Data.N
+    N = _bl_points.N
     y_unflipped[:, 6 : 6 + N * 2] = y_flipped[:, 6 + N * 3 : 6 + N * 5]
     y_unflipped[:, 6 + N * 3 : 6 + N * 5] = y_flipped[:, 6 : 6 + N * 2]
 
@@ -295,18 +301,18 @@ def get_aero_from_kulfan_parameters(
     Top_Xtr = y_fused[:, 4]
     Bot_Xtr = y_fused[:, 5]
 
-    upper_bl_ue_over_vinf = y_fused[:, 6 + Data.N * 2 : 6 + Data.N * 3]
-    lower_bl_ue_over_vinf = y_fused[:, 6 + Data.N * 5 : 6 + Data.N * 6]
+    upper_bl_ue_over_vinf = y_fused[:, 6 + _bl_points.N * 2 : 6 + _bl_points.N * 3]
+    lower_bl_ue_over_vinf = y_fused[:, 6 + _bl_points.N * 5 : 6 + _bl_points.N * 6]
 
-    upper_theta = ((10 ** y_fused[:, 6 : 6 + Data.N]) - 0.1) / (
+    upper_theta = ((10 ** y_fused[:, 6 : 6 + _bl_points.N]) - 0.1) / (
         np.abs(upper_bl_ue_over_vinf) * np.reshape(Re, (-1, 1))
     )
-    upper_H = 2.6 * np.exp(y_fused[:, 6 + Data.N : 6 + Data.N * 2])
+    upper_H = 2.6 * np.exp(y_fused[:, 6 + _bl_points.N : 6 + _bl_points.N * 2])
 
-    lower_theta = ((10 ** y_fused[:, 6 + Data.N * 3 : 6 + Data.N * 4]) - 0.1) / (
+    lower_theta = ((10 ** y_fused[:, 6 + _bl_points.N * 3 : 6 + _bl_points.N * 4]) - 0.1) / (
         np.abs(lower_bl_ue_over_vinf) * np.reshape(Re, (-1, 1))
     )
-    lower_H = 2.6 * np.exp(y_fused[:, 6 + Data.N * 4 : 6 + Data.N * 5])
+    lower_H = 2.6 * np.exp(y_fused[:, 6 + _bl_points.N * 4 : 6 + _bl_points.N * 5])
 
     results = {
         "analysis_confidence": analysis_confidence,
@@ -315,12 +321,12 @@ def get_aero_from_kulfan_parameters(
         "CM": CM,
         "Top_Xtr": Top_Xtr,
         "Bot_Xtr": Bot_Xtr,
-        **{f"upper_bl_theta_{i}": upper_theta[:, i] for i in range(Data.N)},
-        **{f"upper_bl_H_{i}": upper_H[:, i] for i in range(Data.N)},
-        **{f"upper_bl_ue/vinf_{i}": upper_bl_ue_over_vinf[:, i] for i in range(Data.N)},
-        **{f"lower_bl_theta_{i}": lower_theta[:, i] for i in range(Data.N)},
-        **{f"lower_bl_H_{i}": lower_H[:, i] for i in range(Data.N)},
-        **{f"lower_bl_ue/vinf_{i}": lower_bl_ue_over_vinf[:, i] for i in range(Data.N)},
+        **{f"upper_bl_theta_{i}": upper_theta[:, i] for i in range(_bl_points.N)},
+        **{f"upper_bl_H_{i}": upper_H[:, i] for i in range(_bl_points.N)},
+        **{f"upper_bl_ue/vinf_{i}": upper_bl_ue_over_vinf[:, i] for i in range(_bl_points.N)},
+        **{f"lower_bl_theta_{i}": lower_theta[:, i] for i in range(_bl_points.N)},
+        **{f"lower_bl_H_{i}": lower_H[:, i] for i in range(_bl_points.N)},
+        **{f"lower_bl_ue/vinf_{i}": lower_bl_ue_over_vinf[:, i] for i in range(_bl_points.N)},
     }
     return {key: np.reshape(value, -1) for key, value in results.items()}
 
@@ -355,18 +361,46 @@ def get_aero_from_airfoil(
         n_weights_per_side=8,
         normalize_coordinates=False,  # No need to redo this
     )
-    delta_alpha = normalization_outputs["rotation_angle"]  # degrees
-    x_translation_LE = normalization_outputs["x_translation"]
-    y_translation_LE = normalization_outputs["y_translation"]
-    scale = normalization_outputs["scale_factor"]
-
-    x_translation_qc = (
-        -x_translation_LE + 0.25 * (1.0 / scale * np.cosd(delta_alpha)) - 0.25
+    return _get_aero_from_normalized_airfoil(
+        kulfan_parameters=normalized_airfoil.kulfan_parameters,
+        x_translation_LE=normalization_outputs["x_translation"],
+        y_translation_LE=normalization_outputs["y_translation"],
+        scale=normalization_outputs["scale_factor"],
+        delta_alpha=normalization_outputs["rotation_angle"],  # degrees
+        alpha=alpha,
+        Re=Re,
+        n_crit=n_crit,
+        xtr_upper=xtr_upper,
+        xtr_lower=xtr_lower,
+        model_size=model_size,
     )
-    y_translation_qc = -y_translation_LE + 0.25 * (1.0 / scale * np.sind(-delta_alpha))
+
+
+def _get_aero_from_normalized_airfoil(
+    kulfan_parameters: dict[str, float | np.ndarray],
+    x_translation_LE: float,
+    y_translation_LE: float,
+    scale: float,
+    delta_alpha: float,
+    alpha: float | np.ndarray,
+    Re: float | np.ndarray,
+    n_crit: float | np.ndarray,
+    xtr_upper: float | np.ndarray,
+    xtr_lower: float | np.ndarray,
+    model_size: str,
+) -> dict[str, float | np.ndarray]:
+    """
+    Evaluates an airfoil given as Kulfan parameters of its normalized shape, plus the translation,
+    scaling and rotation (degrees) that normalized it; corrects angle of attack, Reynolds number and
+    moment back to the airfoil as given.
+    """
+    x_translation_qc = (
+        -x_translation_LE + 0.25 * (1.0 / scale * cosd(delta_alpha)) - 0.25
+    )
+    y_translation_qc = -y_translation_LE + 0.25 * (1.0 / scale * sind(-delta_alpha))
 
     raw_aero = get_aero_from_kulfan_parameters(
-        kulfan_parameters=normalized_airfoil.kulfan_parameters,
+        kulfan_parameters=kulfan_parameters,
         alpha=alpha + delta_alpha,
         Re=Re / scale,
         n_crit=n_crit,
@@ -408,8 +442,17 @@ def get_aero_from_coordinates(
     Returns: A dictionary with outputs. See `get_aero_from_kulfan_parameters()` for details.
 
     """
-    return get_aero_from_airfoil(
-        airfoil=asb.Airfoil(coordinates=coordinates),
+    normalization = geometry.normalize(coordinates)
+    return _get_aero_from_normalized_airfoil(
+        kulfan_parameters=geometry.get_kulfan_parameters(
+            normalization.coordinates,
+            n_weights_per_side=8,
+            normalize_coordinates=False,  # No need to redo this
+        ),
+        x_translation_LE=normalization.x_translation,
+        y_translation_LE=normalization.y_translation,
+        scale=normalization.scale_factor,
+        delta_alpha=normalization.rotation_angle,
         alpha=alpha,
         Re=Re,
         n_crit=n_crit,
@@ -436,22 +479,52 @@ def get_aero_from_dat_file(
 
     Args:
 
-        filename: A string with the path to the standard Selig-formatted .dat file defining an airfoil shape.
+        filename: Path to a .dat file defining an airfoil shape, in Selig or Lednicer format. See
+        `neuralfoil.geometry.read_dat()`.
 
         For other arguments, see `get_aero_from_kulfan_parameters()`.
 
     Returns: A dictionary with outputs. See `get_aero_from_kulfan_parameters()` for details.
 
     """
-    with open(filename, "r") as f:
-        raw_text = f.readlines()
-
-    from aerosandbox.geometry.airfoil.airfoil_families import (
-        get_coordinates_from_raw_dat,
+    return get_aero_from_coordinates(
+        coordinates=geometry.read_dat(filename),
+        alpha=alpha,
+        Re=Re,
+        n_crit=n_crit,
+        xtr_upper=xtr_upper,
+        xtr_lower=xtr_lower,
+        model_size=model_size,
     )
 
+
+def get_aero_from_naca(
+    designation: str,
+    alpha: float | np.ndarray,
+    Re: float | np.ndarray,
+    n_crit: float | np.ndarray = 9.0,
+    xtr_upper: float | np.ndarray = 1.0,
+    xtr_lower: float | np.ndarray = 1.0,
+    model_size: str = "xlarge",
+) -> dict[str, float | np.ndarray]:
+    """
+    Computes aerodynamic coefficients and boundary layer parameters for an aerodynamics case.
+
+    Geometry is a NACA 4-digit or 5-digit airfoil given by its designation, e.g. "2412", "NACA 0012"
+    or "23012". Essentially, this function is a higher level of abstraction around
+    `get_aero_from_kulfan_parameters()`.
+
+    Args:
+
+        designation: The NACA designation. See `neuralfoil.geometry.naca()`.
+
+        For other arguments, see `get_aero_from_kulfan_parameters()`.
+
+    Returns: A dictionary with outputs. See `get_aero_from_kulfan_parameters()` for details.
+
+    """
     return get_aero_from_coordinates(
-        coordinates=get_coordinates_from_raw_dat(raw_text=raw_text),
+        coordinates=geometry.naca(designation),
         alpha=alpha,
         Re=Re,
         n_crit=n_crit,
@@ -462,6 +535,8 @@ def get_aero_from_dat_file(
 
 
 if __name__ == "__main__":
+    import aerosandbox as asb
+
     airfoil = asb.Airfoil("dae11").repanel().normalize()
     # airfoil = asb.Airfoil("naca0050")
     # airfoil = asb.Airfoil("naca0012").add_control_surface(10, hinge_point_x=0.5)

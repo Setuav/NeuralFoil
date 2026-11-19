@@ -1,6 +1,7 @@
 import pytest
 import neuralfoil as nf
-import aerosandbox as asb
+
+asb = pytest.importorskip("aerosandbox")
 
 
 def test_basic_functionality():

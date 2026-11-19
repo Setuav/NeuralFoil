@@ -59,7 +59,7 @@ Using NeuralFoil is dead-simple, and also offers several possible "entry points"
 import neuralfoil as nf  # `pip install neuralfoil`
 import numpy as np
 
-aero = nf.get_aero_from_dat_file(  # You can use a .dat file as an entry point
+aero = nf.get_aero_from_dat_file(  # You can use a .dat file (Selig or Lednicer format) as an entry point
     filename="/path/to/my_airfoil_file.dat",
     alpha=5,  # Angle of attack [deg]
     Re=5e6,  # Reynolds number [-]
@@ -72,7 +72,12 @@ aero = nf.get_aero_from_coordinates(  # You can use xy airfoil coordinates as an
     Re=5e6,
 )
 
-import aerosandbox as asb  # `pip install aerosandbox`
+aero = nf.get_aero_from_naca(  # You can use a NACA 4-digit or 5-digit designation as an entry point
+    designation="23012",
+    alpha=5, Re=5e6,
+)
+
+import aerosandbox as asb  # `pip install neuralfoil[asb]`
 aero = nf.get_aero_from_airfoil(  # You can use AeroSandbox airfoils as an entry point
     airfoil=asb.Airfoil("naca4412"),  # any UIUC or NACA airfoil name works
     alpha=5, Re=5e6,
@@ -161,11 +166,12 @@ Validation cases for all three features are given in the [NeuralFoil whitepaper]
 [Install from PyPI](https://pypi.org/project/NeuralFoil/) with `pip install neuralfoil`.
 
 <a name="dependencies-question"></a>
-To run models, NeuralFoil currently requires minimal dependencies:
+To run models, NeuralFoil requires minimal dependencies:
 
 * Python 3.10+
 * [NumPy](https://numpy.org/)
-* [AeroSandbox](https://github.com/peterdsharpe/AeroSandbox) 4.2.4+
+
+[AeroSandbox](https://github.com/peterdsharpe/AeroSandbox) 4.2.7+ is optional (`pip install neuralfoil[asb]`). With it, `get_aero_from_airfoil()` accepts AeroSandbox `Airfoil` objects and NeuralFoil accepts CasADi symbolic inputs, for use in AeroSandbox optimization problems. Results are identical with or without it.
 
 ## Geometry Parameterization and Training Data
 
@@ -187,6 +193,12 @@ For more details on this parameterization, or why it is a good choice, read:
 - The seminal paper on the CST (Kulfan) parameterization technique: [Brenda Kulfan, "Universal Parametric Geometry Representation Method"](https://www.brendakulfan.com/research)
 
 To convert between airfoil coordinates and the CST parameterization, use the following functions:
+
+```python
+from neuralfoil.geometry import get_kulfan_parameters, get_kulfan_coordinates
+```
+
+`neuralfoil.geometry` also reads .dat files (`read_dat`), generates NACA 4-digit and 5-digit airfoils (`naca`), and normalizes coordinates to a unit chord (`normalize`), all in NumPy. Its Kulfan functions match AeroSandbox's, which are equivalent:
 
 ```python
 from aerosandbox.geometry.airfoil.airfoil_families import get_kulfan_parameters, get_kulfan_coordinates

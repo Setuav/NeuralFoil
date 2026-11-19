@@ -42,10 +42,6 @@ classifiers = [
 
 dependencies = [
     "numpy>=1.26",
-    # 4.2.7 is the first AeroSandbox release compatible with NeuralFoil 0.3.x
-    # (earlier releases pin neuralfoil<0.3.0). Capped below the next minor
-    # because the two packages co-evolve; see AeroSandbox's mirrored cap.
-    "aerosandbox>=4.2.7,<4.3.0",
 ]
 
 [project.optional-dependencies]
@@ -56,6 +52,14 @@ test = [
     "pytest>=7.0",
     "nbval>=0.10",
 ]
+# AeroSandbox is optional: inference and geometry run on NumPy alone. With it installed,
+# `get_aero_from_airfoil()` accepts AeroSandbox airfoils and inference accepts CasADi inputs.
+asb = [
+    # 4.2.7 is the first AeroSandbox release compatible with NeuralFoil 0.3.x
+    # (earlier releases pin neuralfoil<0.3.0). Capped below the next minor
+    # because the two packages co-evolve; see AeroSandbox's mirrored cap.
+    "aerosandbox>=4.2.7,<4.3.0",
+]
 
 [project.urls]
 Source = "https://github.com/peterdsharpe/NeuralFoil"
@@ -63,6 +67,7 @@ Source = "https://github.com/peterdsharpe/NeuralFoil"
 
 [dependency-groups]
 training = [
+    "aerosandbox>=4.2.7,<4.3.0",
     "torch>=2.0",
     "ray>=2.7",
     "polars>=1.0",

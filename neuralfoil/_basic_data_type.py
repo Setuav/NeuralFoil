@@ -19,23 +19,8 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar
 from scipy import interpolate
 
-
-def compute_optimal_x_points(n_points: int) -> np.ndarray:
-    """
-    Compute x-coordinates for the boundary layer evaluation points ("sensors").
-
-    Creates evenly spaced midpoints between 0 and 1, avoiding the exact edges.
-    (Uniform spacing is used for simplicity; see the compressed-sensing study in
-    `training/optimal_sensor_placement/` for non-uniform alternatives considered.)
-
-    Args:
-        n_points: Number of points to generate.
-
-    Returns:
-        Array of x-coordinates of shape (n_points,).
-    """
-    s = np.linspace(0, 1, n_points + 1)
-    return (s[1:] + s[:-1]) / 2
+from neuralfoil import _bl_points
+from neuralfoil._bl_points import compute_optimal_x_points  # noqa: F401 (re-exported for training scripts)
 
 
 @dataclass
@@ -48,8 +33,8 @@ class Data:
     xtr_upper: float
     xtr_lower: float
 
-    N: ClassVar[int] = 32  # Number of boundary layer evaluation points per surface
-    bl_x_points: ClassVar[np.ndarray] = compute_optimal_x_points(n_points=N)
+    N: ClassVar[int] = _bl_points.N  # Number of boundary layer evaluation points per surface
+    bl_x_points: ClassVar[np.ndarray] = _bl_points.bl_x_points
 
     analysis_confidence: float  # Nominally 0 (no confidence) to 1 (high confidence)
 
