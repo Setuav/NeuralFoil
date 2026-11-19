@@ -1,3 +1,11 @@
+> [!NOTE]
+> **This is Setuav's fork of [NeuralFoil](https://github.com/peterdsharpe/NeuralFoil)**, published as
+> `pip install setuav-neuralfoil` and imported as `import setuav_neuralfoil as nf`. It runs on NumPy
+> alone (AeroSandbox is optional), reads Lednicer as well as Selig .dat files, and generates NACA
+> 4-digit and 5-digit airfoils (`nf.get_aero_from_naca("23012", ...)`). The neural networks and their
+> results are NeuralFoil's, unchanged. All credit for NeuralFoil goes to Peter Sharpe; see
+> [FORK.md](./FORK.md). The rest of this README is upstream's.
+
 <p align="center">
     <img src="./media/neuralfoil_logo.svg" width="800" />
 </p>

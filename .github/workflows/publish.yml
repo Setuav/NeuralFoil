@@ -1,0 +1,45 @@
+# Publishes setuav-neuralfoil to PyPI when a GitHub release is published, using PyPI Trusted Publishing.
+
+name: Publish to PyPI
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' , '3.13' ]
+        extras: [ '--extra test --extra asb', '--extra test' ]  # With and without AeroSandbox.
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - name: Test with pytest
+        run: |
+          uv run --python ${{ matrix.python-version }} ${{ matrix.extras }} --no-dev pytest tests
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      id-token: write  # Required for Trusted Publishing
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Build
+        run: uv build
+      - name: Check the wheel installs as setuav_neuralfoil, next to upstream NeuralFoil
+        run: |
+          uv venv /tmp/check
+          uv pip install --python /tmp/check neuralfoil dist/*.whl
+          /tmp/check/bin/python -c "import neuralfoil, setuav_neuralfoil as nf; assert hasattr(nf, 'geometry') and not hasattr(neuralfoil, 'geometry'); nf.get_aero_from_naca('2412', alpha=4.0, Re=1e6)"
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

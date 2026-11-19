@@ -1574,65 +1574,16 @@ wheels = [
 [[package]]
 name = "neuralfoil"
 version = "0.3.3"
-source = { editable = "." }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "aerosandbox" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-
-[package.optional-dependencies]
-asb = [
-    { name = "aerosandbox" },
-]
-test = [
-    { name = "nbval" },
-    { name = "pytest" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "aerosandbox" },
-    { name = "nbval" },
-    { name = "polars" },
-    { name = "pytest" },
-    { name = "ray" },
-    { name = "torch" },
-    { name = "tqdm" },
-]
-training = [
-    { name = "aerosandbox" },
-    { name = "polars" },
-    { name = "ray" },
-    { name = "torch" },
-    { name = "tqdm" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aerosandbox", marker = "extra == 'asb'", specifier = ">=4.2.7,<4.3.0" },
-    { name = "nbval", marker = "extra == 'test'", specifier = ">=0.10" },
-    { name = "numpy", specifier = ">=1.26" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
-]
-provides-extras = ["test", "asb"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
-    { name = "nbval", specifier = ">=0.10" },
-    { name = "polars", specifier = ">=1.0" },
-    { name = "pytest", specifier = ">=7.0" },
-    { name = "ray", specifier = ">=2.7" },
-    { name = "torch", specifier = ">=2.0" },
-    { name = "tqdm", specifier = ">=4.60" },
-]
-training = [
-    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
-    { name = "polars", specifier = ">=1.0" },
-    { name = "ray", specifier = ">=2.7" },
-    { name = "torch", specifier = ">=2.0" },
-    { name = "tqdm", specifier = ">=4.60" },
+sdist = { url = "https://files.pythonhosted.org/packages/50/52/044887b601db7b0ed8fa4f0f89a26a21e437eacd1dba0ef6e33d24701fff/neuralfoil-0.3.3.tar.gz", hash = "sha256:9842e46cfb4e550eedd065fb8273d4bfd3b30d3648054107b274094038c0ed2f", size = 7571479, upload-time = "2026-07-11T17:27:58.264Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/00/78ef31ec6078adacd18dfc92448d07aec2ee35380ab15904d1c8e0953c44/neuralfoil-0.3.3-py3-none-any.whl", hash = "sha256:06fe7667ddc10cd29a9114d5513c913f4970c22a77b31298dee6180a9c983d3e", size = 7555964, upload-time = "2026-07-11T17:27:56.405Z" },
 ]
 
 [[package]]
@@ -3111,6 +3062,70 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/86/59/a451d7420a77ab0b98f7affa3a1d78a313d2f7281a57afb1a34bae8ab412/seaborn-0.13.2.tar.gz", hash = "sha256:93e60a40988f4d65e9f4885df477e2fdaff6b73a9ded434c1ab356dd57eefff7", size = 1457696, upload-time = "2024-01-25T13:21:52.551Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/83/11/00d3c3dfc25ad54e731d91449895a79e4bf2384dc3ac01809010ba88f6d5/seaborn-0.13.2-py3-none-any.whl", hash = "sha256:636f8336facf092165e27924f223d3c62ca560b1f2bb5dff7ab7fad265361987", size = 294914, upload-time = "2024-01-25T13:21:49.598Z" },
+]
+
+[[package]]
+name = "setuav-neuralfoil"
+version = "0.3.3.1"
+source = { virtual = "." }
+dependencies = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+
+[package.optional-dependencies]
+asb = [
+    { name = "aerosandbox" },
+]
+test = [
+    { name = "nbval" },
+    { name = "pytest" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "aerosandbox" },
+    { name = "nbval" },
+    { name = "polars" },
+    { name = "pytest" },
+    { name = "ray" },
+    { name = "torch" },
+    { name = "tqdm" },
+]
+training = [
+    { name = "aerosandbox" },
+    { name = "polars" },
+    { name = "ray" },
+    { name = "torch" },
+    { name = "tqdm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aerosandbox", marker = "extra == 'asb'", specifier = ">=4.2.7,<4.3.0" },
+    { name = "nbval", marker = "extra == 'test'", specifier = ">=0.10" },
+    { name = "numpy", specifier = ">=1.26" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
+]
+provides-extras = ["test", "asb"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
+    { name = "nbval", specifier = ">=0.10" },
+    { name = "polars", specifier = ">=1.0" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "ray", specifier = ">=2.7" },
+    { name = "torch", specifier = ">=2.0" },
+    { name = "tqdm", specifier = ">=4.60" },
+]
+training = [
+    { name = "aerosandbox", specifier = ">=4.2.7,<4.3.0" },
+    { name = "polars", specifier = ">=1.0" },
+    { name = "ray", specifier = ">=2.7" },
+    { name = "torch", specifier = ">=2.0" },
+    { name = "tqdm", specifier = ">=4.60" },
 ]
 
 [[package]]

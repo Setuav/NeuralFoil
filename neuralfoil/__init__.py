@@ -21,6 +21,6 @@ __all__ = [
 try:
     from importlib.metadata import version
 
-    __version__ = version("NeuralFoil")
+    __version__ = version("setuav-neuralfoil")
 except Exception:
     __version__ = "unknown"

@@ -3,14 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "NeuralFoil"
-version = "0.3.3"
-description = "NeuralFoil is an airfoil aerodynamics analysis tool using physics-informed machine learning, in pure Python/NumPy."
+name = "setuav-neuralfoil"
+version = "0.3.3.1"
+description = "Setuav's fork of NeuralFoil that runs on NumPy alone: airfoil aerodynamics with physics-informed machine learning."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "Peter Sharpe", email = "pds@mit.edu" }
+]
+maintainers = [
+    { name = "Setuav" }
 ]
 keywords = [
     "python",
@@ -62,8 +65,8 @@ asb = [
 ]
 
 [project.urls]
-Source = "https://github.com/peterdsharpe/NeuralFoil"
-"Bug Reports" = "https://github.com/peterdsharpe/NeuralFoil/issues"
+Source = "https://github.com/Setuav/NeuralFoil"
+Upstream = "https://github.com/peterdsharpe/NeuralFoil"
 
 [dependency-groups]
 training = [
@@ -82,6 +85,11 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["neuralfoil"]
 
+# Installed as `setuav_neuralfoil`, so that it never overwrites an upstream `neuralfoil`
+# installed alongside it (e.g. by AeroSandbox).
+[tool.hatch.build.targets.wheel.sources]
+"neuralfoil" = "setuav_neuralfoil"
+
 [tool.hatch.build.targets.sdist]
 include = [
     "/neuralfoil",
@@ -90,3 +98,11 @@ include = [
     "/README.md",
     "/LICENSE.txt",
 ]
+
+# The wheel installs the package as `setuav_neuralfoil`, a rename that editable installs cannot do.
+# So uv does not install the project for development; the tests import `neuralfoil` from the source tree.
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
